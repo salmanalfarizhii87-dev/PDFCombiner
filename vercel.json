@@ -3,11 +3,19 @@
   "builds": [
     {
       "src": "api/combine.php",
-      "use": "@vercel/php"
+      "use": "@vercel/php",
+      "config": {
+        "maxDuration": 30,
+        "memory": 1024
+      }
     },
     {
       "src": "api/download.php", 
-      "use": "@vercel/php"
+      "use": "@vercel/php",
+      "config": {
+        "maxDuration": 10,
+        "memory": 512
+      }
     },
     {
       "src": "public/**",
@@ -32,16 +40,6 @@
       "dest": "/public/$1"
     }
   ],
-  "functions": {
-    "api/combine.php": {
-      "maxDuration": 30,
-      "memory": 1024
-    },
-    "api/download.php": {
-      "maxDuration": 10,
-      "memory": 512
-    }
-  },
   "env": {
     "UPLOAD_MAX_SIZE": "10485760"
   }

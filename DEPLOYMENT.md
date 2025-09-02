@@ -86,16 +86,37 @@ File ini mengatur:
 - Build configuration untuk PHP functions
 - Routing untuk API endpoints
 - Static file serving
-- Function timeout settings
+- Function timeout dan memory settings (dalam `config` object)
 - Environment variables
+
+**Catatan**: Vercel tidak mengizinkan penggunaan `functions` dan `builds` secara bersamaan. Konfigurasi timeout dan memory harus diletakkan dalam `config` object di dalam `builds`.
 
 ### Environment Variables
 - `UPLOAD_MAX_SIZE`: Maksimal ukuran file upload (default: 10MB)
 
 ## Troubleshooting
 
+### Warning: "The `functions` property cannot be used in conjunction with the `builds` property"
+- **Solusi**: Hapus property `functions` dari `vercel.json`
+- Konfigurasi timeout dan memory harus diletakkan dalam `config` object di dalam `builds`
+- Contoh yang benar:
+  ```json
+  {
+    "builds": [
+      {
+        "src": "api/combine.php",
+        "use": "@vercel/php",
+        "config": {
+          "maxDuration": 30,
+          "memory": 1024
+        }
+      }
+    ]
+  }
+  ```
+
 ### Error: "Function timeout"
-- Pastikan `maxDuration` di `vercel.json` cukup (default: 30 detik)
+- Pastikan `maxDuration` di `config` object cukup (default: 30 detik)
 - Optimasi kode PHP untuk performa yang lebih baik
 
 ### Error: "File not found"
