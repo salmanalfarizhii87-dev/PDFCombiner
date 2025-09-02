@@ -150,6 +150,9 @@ export default async function handler(req, res) {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const filename = `combined_${timestamp}_${Math.random().toString(36).substr(2, 9)}.pdf`;
 
+      // Convert to base64 properly
+      const base64Data = Buffer.from(pdfBytes).toString('base64');
+
       // Return success response
       res.status(200).json({
         success: true,
@@ -158,7 +161,7 @@ export default async function handler(req, res) {
         pageCount: pageCount,
         layout: `${rows}x${cols}`,
         downloadUrl: `/api/download?file=${encodeURIComponent(filename)}`,
-        pdfData: pdfBytes.toString('base64')
+        pdfData: base64Data
       });
 
     } catch (error) {

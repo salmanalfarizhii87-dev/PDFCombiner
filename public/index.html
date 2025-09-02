@@ -218,13 +218,41 @@
     </div>
 
     <script>
+        // Function to validate and clean base64 data
+        function validateBase64(base64Data) {
+            if (!base64Data || typeof base64Data !== 'string') {
+                return null;
+            }
+            
+            // Remove any whitespace and newlines
+            const cleaned = base64Data.replace(/\s/g, '');
+            
+            // Check if it's valid base64
+            const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
+            if (!base64Regex.test(cleaned)) {
+                console.error('Invalid base64 data');
+                return null;
+            }
+            
+            return cleaned;
+        }
+
         // Function to download PDF from base64 data
         function downloadPDF(base64Data, filename) {
             try {
                 console.log('Starting download process...');
+                console.log('Original data length:', base64Data ? base64Data.length : 'No data');
+                
+                // Validate and clean base64 data
+                const validBase64 = validateBase64(base64Data);
+                if (!validBase64) {
+                    throw new Error('Invalid base64 data');
+                }
+                
+                console.log('Validated data length:', validBase64.length);
                 
                 // Method 1: Using Blob and Object URL
-                const binaryString = atob(base64Data);
+                const binaryString = atob(validBase64);
                 const bytes = new Uint8Array(binaryString.length);
                 for (let i = 0; i < binaryString.length; i++) {
                     bytes[i] = binaryString.charCodeAt(i);
@@ -254,20 +282,25 @@
                 
                 // Fallback method: Direct data URL
                 try {
-                    const dataUrl = 'data:application/pdf;base64,' + base64Data;
-                    const fallbackLink = document.createElement('a');
-                    fallbackLink.href = dataUrl;
-                    fallbackLink.download = filename;
-                    fallbackLink.style.display = 'none';
-                    
-                    document.body.appendChild(fallbackLink);
-                    fallbackLink.click();
-                    document.body.removeChild(fallbackLink);
-                    
-                    console.log('Fallback download method used');
+                    const validBase64 = validateBase64(base64Data);
+                    if (validBase64) {
+                        const dataUrl = 'data:application/pdf;base64,' + validBase64;
+                        const fallbackLink = document.createElement('a');
+                        fallbackLink.href = dataUrl;
+                        fallbackLink.download = filename;
+                        fallbackLink.style.display = 'none';
+                        
+                        document.body.appendChild(fallbackLink);
+                        fallbackLink.click();
+                        document.body.removeChild(fallbackLink);
+                        
+                        console.log('Fallback download method used');
+                    } else {
+                        throw new Error('Invalid base64 data for fallback');
+                    }
                 } catch (fallbackError) {
                     console.error('Fallback download error:', fallbackError);
-                    alert('Error downloading file. Please try again or check your browser settings.');
+                    alert('Error downloading file. The PDF data may be corrupted. Please try again.');
                 }
             }
         }
@@ -312,13 +345,17 @@
                     const downloadBtn = document.getElementById('downloadBtn');
                     downloadBtn.addEventListener('click', function() {
                         console.log('Download button clicked');
+                        console.log('Full response data:', data);
+                        console.log('PDF data type:', typeof data.pdfData);
                         console.log('PDF data length:', data.pdfData ? data.pdfData.length : 'No data');
+                        console.log('PDF data preview:', data.pdfData ? data.pdfData.substring(0, 100) + '...' : 'No data');
                         console.log('Filename:', data.filename);
                         
-                        if (data.pdfData) {
+                        if (data.pdfData && typeof data.pdfData === 'string') {
                             downloadPDF(data.pdfData, data.filename);
                         } else {
-                            alert('No PDF data available for download');
+                            console.error('Invalid PDF data:', data.pdfData);
+                            alert('No valid PDF data available for download. Please try again.');
                         }
                     });
                 } else {
