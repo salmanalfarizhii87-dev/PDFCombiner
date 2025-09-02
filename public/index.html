@@ -218,6 +218,60 @@
     </div>
 
     <script>
+        // Function to download PDF from base64 data
+        function downloadPDF(base64Data, filename) {
+            try {
+                console.log('Starting download process...');
+                
+                // Method 1: Using Blob and Object URL
+                const binaryString = atob(base64Data);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                const blob = new Blob([bytes], { type: 'application/pdf' });
+                const url = window.URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                link.style.display = 'none';
+                
+                document.body.appendChild(link);
+                link.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+                
+                console.log('Download initiated successfully');
+                
+            } catch (error) {
+                console.error('Download error:', error);
+                
+                // Fallback method: Direct data URL
+                try {
+                    const dataUrl = 'data:application/pdf;base64,' + base64Data;
+                    const fallbackLink = document.createElement('a');
+                    fallbackLink.href = dataUrl;
+                    fallbackLink.download = filename;
+                    fallbackLink.style.display = 'none';
+                    
+                    document.body.appendChild(fallbackLink);
+                    fallbackLink.click();
+                    document.body.removeChild(fallbackLink);
+                    
+                    console.log('Fallback download method used');
+                } catch (fallbackError) {
+                    console.error('Fallback download error:', fallbackError);
+                    alert('Error downloading file. Please try again or check your browser settings.');
+                }
+            }
+        }
+
         document.getElementById('pdfForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -241,30 +295,6 @@
                 loading.style.display = 'none';
                 
                 if (data.success) {
-                    // Create download button that downloads the PDF directly
-                    const downloadButton = document.createElement('button');
-                    downloadButton.className = 'btn btn-success';
-                    downloadButton.innerHTML = '⬇️ Download PDF';
-                    downloadButton.onclick = function() {
-                        // Convert base64 to blob and download
-                        const byteCharacters = atob(data.pdfData);
-                        const byteNumbers = new Array(byteCharacters.length);
-                        for (let i = 0; i < byteCharacters.length; i++) {
-                            byteNumbers[i] = byteCharacters.charCodeAt(i);
-                        }
-                        const byteArray = new Uint8Array(byteNumbers);
-                        const blob = new Blob([byteArray], { type: 'application/pdf' });
-                        
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = data.filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        window.URL.revokeObjectURL(url);
-                        document.body.removeChild(a);
-                    };
-                    
                     result.innerHTML = `
                         <div class="result success" style="display: block;">
                             <h3>✅ ${data.message}</h3>
@@ -274,11 +304,23 @@
                                 <p><strong>Layout:</strong> ${data.layout}</p>
                             </div>
                             <br>
+                            <button id="downloadBtn" class="btn btn-success">⬇️ Download PDF</button>
                         </div>
                     `;
                     
-                    // Append download button
-                    result.querySelector('.result.success').appendChild(downloadButton);
+                    // Add download functionality
+                    const downloadBtn = document.getElementById('downloadBtn');
+                    downloadBtn.addEventListener('click', function() {
+                        console.log('Download button clicked');
+                        console.log('PDF data length:', data.pdfData ? data.pdfData.length : 'No data');
+                        console.log('Filename:', data.filename);
+                        
+                        if (data.pdfData) {
+                            downloadPDF(data.pdfData, data.filename);
+                        } else {
+                            alert('No PDF data available for download');
+                        }
+                    });
                 } else {
                     result.innerHTML = `
                         <div class="result error" style="display: block;">
