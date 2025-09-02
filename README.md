@@ -1,64 +1,85 @@
-# 📄 PDF Combiner
+# PDF Combiner
 
-Aplikasi web berbasis PHP untuk menggabungkan beberapa halaman PDF menjadi satu halaman PDF dengan layout yang dapat dikustomisasi.
+Aplikasi web berbasis PHP untuk menggabungkan beberapa halaman PDF menjadi satu halaman PDF dengan layout yang dapat dikustomisasi. Aplikasi ini dapat di-deploy ke Vercel dengan mudah.
 
-[![PHP Version](https://img.shields.io/badge/PHP-7.4%2B-blue.svg)](https://php.net)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/yourusername/PDFCombiner.svg)](https://github.com/yourusername/PDFCombiner/stargazers)
+## Fitur
 
-## ✨ Fitur Utama
+- Upload file PDF dengan drag & drop atau klik
+- Pilihan layout: 2, 4, 5, 6, atau 8 halaman per sheet
+- Validasi file PDF (maksimal 10MB)
+- Preview nama file yang diupload
+- Loading spinner saat proses
+- Download hasil PDF
+- Reset form untuk upload ulang
+- UI modern dan responsif
+- Deploy ke Vercel dengan mudah
 
-- 📁 **Upload Mudah** - Drag & drop atau klik untuk upload file PDF
-- ⚙️ **Layout Fleksibel** - 2, 4, 5, 6, atau 8 halaman per sheet
-- 📏 **Ukuran Kertas** - A4, Letter, Legal, A3, A5, B4, B5
-- 🎨 **Pengaturan Halaman** - Side by Side (Horizontal) atau Top and Bottom (Vertical)
-- 🔒 **Validasi File** - Hanya PDF, maksimal 10MB
-- ⚡ **Proses Cepat** - Menggunakan library FPDI yang powerful
-- 🎯 **UI Modern** - Interface responsif dengan animasi smooth
-- 📱 **Mobile Friendly** - Bekerja sempurna di desktop dan mobile
+## Deployment ke Vercel
 
-## Persyaratan Sistem
+### Persyaratan
+- Akun Vercel (gratis)
+- Git repository (GitHub, GitLab, atau Bitbucket)
+- Node.js (untuk Vercel CLI)
 
-- PHP 7.4 atau lebih tinggi
-- Composer
-- Web server (Apache/Nginx)
-- Ekstensi PHP: GD, mbstring
+### Langkah-langkah Deployment
 
-## 🚀 Demo
+1. **Install Vercel CLI** (opsional):
+   ```bash
+   npm install -g vercel
+   ```
 
-### Versi yang Tersedia:
-- **[Simple Test](simple_test.php)** - Versi sederhana untuk testing (Recommended)
-- **[Modern UI](index_working.php)** - UI modern tanpa JavaScript
-- **[Full Featured](index.php)** - Versi lengkap dengan drag & drop
-- **[Paper Sizes Demo](paper_sizes_demo.html)** - Demo visual ukuran kertas
+2. **Push kode ke Git repository**:
+   ```bash
+   git add .
+   git commit -m "Prepare for Vercel deployment"
+   git push origin main
+   ```
 
-### Screenshots:
-![PDF Combiner Interface](screenshots/interface.png)
-*Interface utama dengan opsi pengaturan*
+3. **Deploy ke Vercel**:
+   
+   **Opsi A: Via Vercel Dashboard**
+   - Buka [vercel.com](https://vercel.com)
+   - Login dengan akun GitHub/GitLab/Bitbucket
+   - Klik "New Project"
+   - Import repository Anda
+   - Vercel akan otomatis detect konfigurasi PHP
 
-![Paper Sizes](screenshots/paper-sizes.png)
-*Demo ukuran kertas yang tersedia*
+   **Opsi B: Via Vercel CLI**
+   ```bash
+   vercel login
+   vercel --prod
+   ```
 
-## 📦 Instalasi
+4. **Konfigurasi Environment Variables** (jika diperlukan):
+   - Buka project di Vercel Dashboard
+   - Go to Settings > Environment Variables
+   - Tambahkan variabel yang diperlukan
 
-### 1. Clone Repository
-```bash
-git clone https://github.com/yourusername/PDFCombiner.git
-cd PDFCombiner
+### Struktur untuk Vercel
+
+```
+PDFCombiner/
+├── api/
+│   ├── combine.php      # API endpoint untuk combine PDF
+│   └── download.php     # API endpoint untuk download
+├── public/
+│   └── index.html       # Frontend aplikasi
+├── vendor/              # PHP dependencies
+├── vercel.json          # Konfigurasi Vercel
+├── package.json         # Node.js dependencies
+├── composer.json        # PHP dependencies
+└── .env.example         # Environment variables template
 ```
 
-### 2. Install Dependencies
-```bash
-composer install
-```
+## Instalasi Lokal
 
-### 3. Set Permissions
-```bash
-chmod 755 output/
-```
-
-### 4. Akses Aplikasi
-Buka browser dan akses: `http://localhost/PDFCombiner/`
+1. Clone atau download project ini
+2. Install dependencies dengan Composer:
+   ```bash
+   composer install
+   ```
+3. Pastikan folder `output/` memiliki permission write (755)
+4. Akses aplikasi melalui web browser
 
 ## Struktur Project
 

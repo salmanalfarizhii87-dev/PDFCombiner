@@ -1,0 +1,47 @@
+# Ignore files that shouldn't be deployed to Vercel
+
+# Local development files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Output files (generated PDFs)
+output/
+*.pdf
+
+# Development and test files
+debug_process.php
+index_simple.php
+index_working.php
+info.php
+process.php
+simple_test.php
+test_process.php
+test_upload.php
+paper_sizes_demo.html
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/

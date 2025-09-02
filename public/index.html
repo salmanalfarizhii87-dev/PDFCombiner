@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Combiner - Gabungkan Halaman PDF</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        input[type="file"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="file"]:focus, select:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result.success {
+            background: #e8f5e8;
+            border: 2px solid #4caf50;
+            color: #2e7d32;
+        }
+
+        .result.error {
+            background: #ffebee;
+            border: 2px solid #f44336;
+            color: #c62828;
+        }
+
+        .file-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4facfe;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📄 PDF Combiner</h1>
+            <p>Gabungkan beberapa halaman PDF menjadi satu halaman dengan mudah</p>
+        </div>
+        
+        <div class="main-content">
+            <form id="pdfForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="pdfFile">Pilih File PDF:</label>
+                    <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pagesPerSheet">Pilih jumlah halaman per sheet:</label>
+                    <select id="pagesPerSheet" name="pagesPerSheet" required>
+                        <option value="2">2 halaman per 1 halaman</option>
+                        <option value="4" selected>4 halaman per 1 halaman</option>
+                        <option value="5">5 halaman per 1 halaman</option>
+                        <option value="6">6 halaman per 1 halaman</option>
+                        <option value="8">8 halaman per 1 halaman</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="pageArrangement">Pengaturan Halaman:</label>
+                    <select id="pageArrangement" name="pageArrangement" required>
+                        <option value="side_by_side" selected>Side by Side (Horizontal)</option>
+                        <option value="top_bottom">Top and Bottom (Vertical)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="paperSize">Ukuran Kertas:</label>
+                    <select id="paperSize" name="paperSize" required>
+                        <option value="A4" selected>A4 (210 × 297 mm)</option>
+                        <option value="Letter">Letter (8.5 × 11 in)</option>
+                        <option value="Legal">Legal (8.5 × 14 in)</option>
+                        <option value="A3">A3 (297 × 420 mm)</option>
+                        <option value="A5">A5 (148 × 210 mm)</option>
+                        <option value="B4">B4 (250 × 353 mm)</option>
+                        <option value="B5">B5 (176 × 250 mm)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    📄 Combine PDF
+                </button>
+            </form>
+
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Sedang memproses PDF...</p>
+            </div>
+
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('pdfForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const loading = document.querySelector('.loading');
+            const result = document.getElementById('result');
+            
+            // Show loading
+            loading.style.display = 'block';
+            result.innerHTML = '';
+            
+            try {
+                const response = await fetch('/api/combine', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                // Hide loading
+                loading.style.display = 'none';
+                
+                if (data.success) {
+                    result.innerHTML = `
+                        <div class="result success" style="display: block;">
+                            <h3>✅ ${data.message}</h3>
+                            <div class="file-info">
+                                <p><strong>Filename:</strong> ${data.filename}</p>
+                                <p><strong>Total halaman asli:</strong> ${data.pageCount}</p>
+                                <p><strong>Layout:</strong> ${data.layout}</p>
+                            </div>
+                            <br>
+                            <a href="${data.downloadUrl}" class="btn btn-success">⬇️ Download PDF</a>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="result error" style="display: block;">
+                            <h3>❌ Error</h3>
+                            <p>${data.error}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                result.innerHTML = `
+                    <div class="result error" style="display: block;">
+                        <h3>❌ Error</h3>
+                        <p>Terjadi kesalahan: ${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
