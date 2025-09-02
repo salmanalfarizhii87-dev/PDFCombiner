@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paper Sizes Demo - PDF Combiner</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .paper-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .paper-card {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        
+        .paper-card:hover {
+            border-color: #4facfe;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.2);
+        }
+        
+        .paper-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .paper-dimensions {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .paper-visual {
+            width: 100%;
+            height: 120px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            margin: 10px 0;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .paper-visual::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #4facfe;
+            border-radius: 3px;
+        }
+        
+        /* Paper size visual representations */
+        .a4::before { width: 70%; height: 99%; }
+        .letter::before { width: 77%; height: 100%; }
+        .legal::before { width: 77%; height: 127%; }
+        .a3::before { width: 99%; height: 70%; }
+        .a5::before { width: 49%; height: 70%; }
+        .b4::before { width: 83%; height: 70%; }
+        .b5::before { width: 59%; height: 83%; }
+        
+        .paper-usage {
+            font-size: 0.9rem;
+            color: #888;
+            font-style: italic;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📄 Paper Sizes Available</h1>
+            <p>Choose the perfect paper size for your PDF combination needs</p>
+        </div>
+        
+        <div class="content">
+            <h2>Available Paper Sizes</h2>
+            <p>Select from various international and regional paper sizes to match your printing requirements.</p>
+            
+            <div class="paper-grid">
+                <div class="paper-card">
+                    <div class="paper-name">A4</div>
+                    <div class="paper-dimensions">210 × 297 mm (8.27 × 11.69 in)</div>
+                    <div class="paper-visual a4"></div>
+                    <div class="paper-usage">Most common size worldwide, standard for business documents</div>
+                </div>
+                
+                <div class="paper-card">
+                    <div class="paper-name">Letter</div>
+                    <div class="paper-dimensions">215.9 × 279.4 mm (8.5 × 11 in)</div>
+                    <div class="paper-visual letter"></div>
+                    <div class="paper-usage">Standard size in North America, commonly used in US and Canada</div>
+                </div>
+                
+                <div class="paper-card">
+                    <div class="paper-name">Legal</div>
+                    <div class="paper-dimensions">215.9 × 355.6 mm (8.5 × 14 in)</div>
+                    <div class="paper-visual legal"></div>
+                    <div class="paper-usage">Longer format, often used for legal documents and contracts</div>
+                </div>
+                
+                <div class="paper-card">
+                    <div class="paper-name">A3</div>
+                    <div class="paper-dimensions">297 × 420 mm (11.69 × 16.54 in)</div>
+                    <div class="paper-visual a3"></div>
+                    <div class="paper-usage">Larger format, great for presentations and posters</div>
+                </div>
+                
+                <div class="paper-card">
+                    <div class="paper-name">A5</div>
+                    <div class="paper-dimensions">148 × 210 mm (5.83 × 8.27 in)</div>
+                    <div class="paper-visual a5"></div>
+                    <div class="paper-usage">Compact size, perfect for booklets and small documents</div>
+                </div>
+                
+                <div class="paper-card">
+                    <div class="paper-name">B4</div>
+                    <div class="paper-dimensions">250 × 353 mm (9.84 × 13.90 in)</div>
+                    <div class="paper-visual b4"></div>
+                    <div class="paper-usage">Intermediate size between A4 and A3, used in some regions</div>
+                </div>
+                
+                <div class="paper-card">
+                    <div class="paper-name">B5</div>
+                    <div class="paper-dimensions">176 × 250 mm (6.93 × 9.84 in)</div>
+                    <div class="paper-visual b5"></div>
+                    <div class="paper-usage">Slightly larger than A5, good for notebooks and journals</div>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="simple_test.php" class="back-link">← Back to PDF Combiner</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

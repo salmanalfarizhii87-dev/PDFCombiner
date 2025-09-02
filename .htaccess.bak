@@ -1,0 +1,22 @@
+# Prevent access to sensitive files
+<Files "composer.json">
+    Require all denied
+</Files>
+
+<Files "composer.lock">
+    Require all denied
+</Files>
+
+# Prevent access to vendor directory
+<Directory "vendor">
+    Require all denied
+</Directory>
+
+# Prevent access to output directory listing
+Options -Indexes
+
+# Set upload limits
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+php_value max_execution_time 300
+php_value memory_limit 256M
