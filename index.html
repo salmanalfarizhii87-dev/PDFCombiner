@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Combiner - Gabungkan Halaman PDF</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .header .version {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .feature-card:hover {
+            border-color: #4facfe;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(79, 172, 254, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .feature-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .demo-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 40px;
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .demo-title {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .demo-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 200px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+            color: white;
+        }
+
+        .btn-info:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(23, 162, 184, 0.4);
+        }
+
+        .info-section {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .info-title {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .info-list li::before {
+            content: '✅';
+            font-size: 1.2rem;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .warning-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .warning-text {
+            color: #856404;
+            line-height: 1.6;
+        }
+
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        .footer a {
+            color: #4facfe;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .demo-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📄 PDF Combiner</h1>
+            <p>Gabungkan beberapa halaman PDF menjadi satu halaman dengan mudah</p>
+            <div class="version">v2.0 - Enhanced Features</div>
+        </div>
+        
+        <div class="content">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📁</div>
+                    <div class="feature-title">Upload Mudah</div>
+                    <div class="feature-description">
+                        Upload file PDF dengan drag & drop atau klik. Mendukung file hingga 10MB dengan validasi otomatis.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚙️</div>
+                    <div class="feature-title">Layout Fleksibel</div>
+                    <div class="feature-description">
+                        Pilih 2, 4, 5, 6, atau 8 halaman per sheet dengan pengaturan horizontal atau vertikal.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📏</div>
+                    <div class="feature-title">Ukuran Kertas</div>
+                    <div class="feature-description">
+                        Dukungan berbagai ukuran kertas: A4, Letter, Legal, A3, A5, B4, dan B5.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <div class="feature-title">UI Modern</div>
+                    <div class="feature-description">
+                        Interface yang bersih dan responsif dengan animasi smooth dan feedback visual.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-title">Proses Cepat</div>
+                    <div class="feature-description">
+                        Menggunakan library FPDI yang powerful untuk pemrosesan PDF yang cepat dan akurat.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <div class="feature-title">Aman & Privat</div>
+                    <div class="feature-description">
+                        File diproses di server Anda sendiri, tidak ada data yang dikirim ke pihak ketiga.
+                    </div>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2 class="demo-title">🚀 Coba Aplikasi Sekarang!</h2>
+                <p>Pilih versi yang sesuai dengan kebutuhan Anda:</p>
+                
+                <div class="demo-buttons">
+                    <a href="simple_test.php" class="btn btn-primary">
+                        📄 Simple Test
+                        <small>(Recommended)</small>
+                    </a>
+                    <a href="index_working.php" class="btn btn-secondary">
+                        🎨 Modern UI
+                        <small>(No JavaScript)</small>
+                    </a>
+                    <a href="index.php" class="btn btn-info">
+                        ✨ Full Featured
+                        <small>(Drag & Drop)</small>
+                    </a>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3 class="info-title">
+                    📋 Fitur Lengkap
+                </h3>
+                <ul class="info-list">
+                    <li>Upload file PDF dengan drag & drop atau klik</li>
+                    <li>Validasi file otomatis (hanya PDF, maksimal 10MB)</li>
+                    <li>Pilihan layout: 2, 4, 5, 6, atau 8 halaman per sheet</li>
+                    <li>Pengaturan halaman: Side by Side atau Top and Bottom</li>
+                    <li>7 ukuran kertas: A4, Letter, Legal, A3, A5, B4, B5</li>
+                    <li>Preview nama file yang diupload</li>
+                    <li>Loading spinner saat proses</li>
+                    <li>Download hasil PDF langsung</li>
+                    <li>Tombol reset untuk upload ulang</li>
+                    <li>UI responsif untuk desktop dan mobile</li>
+                    <li>Error handling yang informatif</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <div class="warning-title">
+                    ⚠️ Catatan Penting
+                </div>
+                <div class="warning-text">
+                    <strong>GitHub Pages tidak mendukung PHP!</strong> Halaman ini hanya untuk demonstrasi. 
+                    Untuk menggunakan aplikasi PDF Combiner, Anda perlu menginstall di server yang mendukung PHP 
+                    (seperti XAMPP, WAMP, atau hosting web dengan PHP). 
+                    <br><br>
+                    <strong>Persyaratan:</strong> PHP 7.4+, Composer, ekstensi GD dan mbstring.
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3 class="info-title">
+                    🛠️ Cara Instalasi
+                </h3>
+                <ol style="padding-left: 20px; line-height: 1.8;">
+                    <li>Download atau clone repository ini</li>
+                    <li>Install dependencies: <code>composer install</code></li>
+                    <li>Pastikan folder <code>output/</code> memiliki permission write</li>
+                    <li>Akses melalui web browser: <code>http://localhost/PDFCombiner/</code></li>
+                    <li>Mulai menggunakan aplikasi!</li>
+                </ol>
+            </div>
+
+            <div class="info-section">
+                <h3 class="info-title">
+                    📚 Dokumentasi
+                </h3>
+                <ul class="info-list">
+                    <li><a href="paper_sizes_demo.html">📏 Demo Ukuran Kertas</a></li>
+                    <li><a href="README.md">📖 README Lengkap</a></li>
+                    <li><a href="https://github.com/yourusername/PDFCombiner">🔗 Repository GitHub</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>PDF Combiner v2.0</strong></p>
+            <p>Dibuat dengan ❤️ menggunakan PHP, FPDI, HTML5, CSS3, dan JavaScript</p>
+            <p>© 2024 - <a href="https://github.com/yourusername">Your GitHub</a></p>
+        </div>
+    </div>
+</body>
+</html>

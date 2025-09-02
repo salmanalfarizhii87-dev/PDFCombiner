@@ -1,17 +1,21 @@
-# PDF Combiner
+# 📄 PDF Combiner
 
 Aplikasi web berbasis PHP untuk menggabungkan beberapa halaman PDF menjadi satu halaman PDF dengan layout yang dapat dikustomisasi.
 
-## Fitur
+[![PHP Version](https://img.shields.io/badge/PHP-7.4%2B-blue.svg)](https://php.net)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/yourusername/PDFCombiner.svg)](https://github.com/yourusername/PDFCombiner/stargazers)
 
-- Upload file PDF dengan drag & drop atau klik
-- Pilihan layout: 2, 4, 5, 6, atau 8 halaman per sheet
-- Validasi file PDF (maksimal 10MB)
-- Preview nama file yang diupload
-- Loading spinner saat proses
-- Download hasil PDF
-- Reset form untuk upload ulang
-- UI modern dan responsif
+## ✨ Fitur Utama
+
+- 📁 **Upload Mudah** - Drag & drop atau klik untuk upload file PDF
+- ⚙️ **Layout Fleksibel** - 2, 4, 5, 6, atau 8 halaman per sheet
+- 📏 **Ukuran Kertas** - A4, Letter, Legal, A3, A5, B4, B5
+- 🎨 **Pengaturan Halaman** - Side by Side (Horizontal) atau Top and Bottom (Vertical)
+- 🔒 **Validasi File** - Hanya PDF, maksimal 10MB
+- ⚡ **Proses Cepat** - Menggunakan library FPDI yang powerful
+- 🎯 **UI Modern** - Interface responsif dengan animasi smooth
+- 📱 **Mobile Friendly** - Bekerja sempurna di desktop dan mobile
 
 ## Persyaratan Sistem
 
@@ -20,15 +24,41 @@ Aplikasi web berbasis PHP untuk menggabungkan beberapa halaman PDF menjadi satu 
 - Web server (Apache/Nginx)
 - Ekstensi PHP: GD, mbstring
 
-## Instalasi
+## 🚀 Demo
 
-1. Clone atau download project ini
-2. Install dependencies dengan Composer:
-   ```bash
-   composer install
-   ```
-3. Pastikan folder `output/` memiliki permission write (755)
-4. Akses aplikasi melalui web browser
+### Versi yang Tersedia:
+- **[Simple Test](simple_test.php)** - Versi sederhana untuk testing (Recommended)
+- **[Modern UI](index_working.php)** - UI modern tanpa JavaScript
+- **[Full Featured](index.php)** - Versi lengkap dengan drag & drop
+- **[Paper Sizes Demo](paper_sizes_demo.html)** - Demo visual ukuran kertas
+
+### Screenshots:
+![PDF Combiner Interface](screenshots/interface.png)
+*Interface utama dengan opsi pengaturan*
+
+![Paper Sizes](screenshots/paper-sizes.png)
+*Demo ukuran kertas yang tersedia*
+
+## 📦 Instalasi
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/yourusername/PDFCombiner.git
+cd PDFCombiner
+```
+
+### 2. Install Dependencies
+```bash
+composer install
+```
+
+### 3. Set Permissions
+```bash
+chmod 755 output/
+```
+
+### 4. Akses Aplikasi
+Buka browser dan akses: `http://localhost/PDFCombiner/`
 
 ## Struktur Project
 
