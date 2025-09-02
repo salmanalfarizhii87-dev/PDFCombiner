@@ -40,10 +40,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, error: 'No file uploaded' });
     }
 
-    const { pagesPerSheet = 4, pageArrangement = 'side_by_side', paperSize = 'A4' } = req.body;
-
     try {
-      console.log('Starting PDF processing...');
+      console.log('Starting simple PDF processing...');
       
       // Load the PDF
       const pdfDoc = await PDFDocument.load(req.file.buffer);
@@ -58,28 +56,37 @@ export default async function handler(req, res) {
       // Create new PDF document
       const newPdfDoc = await PDFDocument.create();
 
-      // Simple approach: just copy all pages to new document
-      console.log('Copying pages to new document...');
+      // Alternative approach: copy pages using different method
+      console.log('Copying pages using alternative method...');
       
-      for (let i = 0; i < pageCount; i++) {
-        console.log(`Copying page ${i + 1} of ${pageCount}`);
+      // Get all pages from original document
+      const pages = pdfDoc.getPages();
+      console.log('Got pages array, length:', pages.length);
+      
+      for (let i = 0; i < pages.length; i++) {
+        console.log(`Processing page ${i + 1} of ${pages.length}`);
         
         try {
+          // Get the page
+          const page = pages[i];
+          console.log(`Page ${i + 1} size:`, page.getSize());
+          
           // Copy page using copyPages method
           const [copiedPage] = await newPdfDoc.copyPages(pdfDoc, [i]);
+          console.log(`Copied page ${i + 1}, size:`, copiedPage.getSize());
           
           // Add the copied page to new document
           newPdfDoc.addPage(copiedPage);
           
-          console.log(`Successfully copied page ${i + 1}`);
+          console.log(`Successfully added page ${i + 1} to new document`);
           
         } catch (pageError) {
-          console.error(`Error copying page ${i + 1}:`, pageError);
+          console.error(`Error processing page ${i + 1}:`, pageError);
           // Skip this page and continue
         }
       }
 
-      console.log('All pages copied, generating PDF...');
+      console.log('All pages processed, generating PDF...');
 
       // Generate PDF bytes
       const pdfBytes = await newPdfDoc.save();
@@ -88,7 +95,7 @@ export default async function handler(req, res) {
 
       // Generate unique filename
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const filename = `combined_${timestamp}_${Math.random().toString(36).substr(2, 9)}.pdf`;
+      const filename = `simple_${timestamp}_${Math.random().toString(36).substr(2, 9)}.pdf`;
 
       // Convert to base64 properly
       const base64Data = Buffer.from(pdfBytes).toString('base64');
@@ -98,7 +105,7 @@ export default async function handler(req, res) {
       // Return success response
       res.status(200).json({
         success: true,
-        message: 'PDF berhasil digabungkan!',
+        message: 'PDF berhasil digabungkan! (Simple Version)',
         filename: filename,
         pageCount: pageCount,
         layout: '1x1 (Simple Copy)',

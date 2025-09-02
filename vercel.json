@@ -9,6 +9,13 @@
       }
     },
     {
+      "src": "api/combine-simple.js",
+      "use": "@vercel/node",
+      "config": {
+        "maxDuration": 30
+      }
+    },
+    {
       "src": "api/download.js", 
       "use": "@vercel/node",
       "config": {
@@ -24,6 +31,10 @@
     {
       "src": "/api/combine",
       "dest": "/api/combine.js"
+    },
+    {
+      "src": "/api/combine-simple",
+      "dest": "/api/combine-simple.js"
     },
     {
       "src": "/api/download",

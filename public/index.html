@@ -206,6 +206,10 @@
                 <button type="submit" class="btn btn-primary">
                     📄 Combine PDF
                 </button>
+                
+                <button type="button" id="testSimpleBtn" class="btn btn-primary" style="margin-left: 10px;">
+                    🧪 Test Simple Copy
+                </button>
             </form>
 
             <div class="loading">
@@ -304,6 +308,78 @@
                 }
             }
         }
+
+        // Test simple copy button
+        document.getElementById('testSimpleBtn').addEventListener('click', async function() {
+            const form = document.getElementById('pdfForm');
+            const formData = new FormData(form);
+            const loading = document.querySelector('.loading');
+            const result = document.getElementById('result');
+            
+            // Show loading
+            loading.style.display = 'block';
+            result.innerHTML = '';
+            
+            try {
+                const response = await fetch('/api/combine-simple', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                // Hide loading
+                loading.style.display = 'none';
+                
+                if (data.success) {
+                    result.innerHTML = `
+                        <div class="result success" style="display: block;">
+                            <h3>✅ ${data.message}</h3>
+                            <div class="file-info">
+                                <p><strong>Filename:</strong> ${data.filename}</p>
+                                <p><strong>Total halaman asli:</strong> ${data.pageCount}</p>
+                                <p><strong>Layout:</strong> ${data.layout}</p>
+                            </div>
+                            <br>
+                            <button id="downloadBtn" class="btn btn-success">⬇️ Download PDF</button>
+                        </div>
+                    `;
+                    
+                    // Add download functionality
+                    const downloadBtn = document.getElementById('downloadBtn');
+                    downloadBtn.addEventListener('click', function() {
+                        console.log('Download button clicked');
+                        console.log('Full response data:', data);
+                        console.log('PDF data type:', typeof data.pdfData);
+                        console.log('PDF data length:', data.pdfData ? data.pdfData.length : 'No data');
+                        console.log('PDF data preview:', data.pdfData ? data.pdfData.substring(0, 100) + '...' : 'No data');
+                        console.log('Filename:', data.filename);
+                        
+                        if (data.pdfData && typeof data.pdfData === 'string') {
+                            downloadPDF(data.pdfData, data.filename);
+                        } else {
+                            console.error('Invalid PDF data:', data.pdfData);
+                            alert('No valid PDF data available for download. Please try again.');
+                        }
+                    });
+                } else {
+                    result.innerHTML = `
+                        <div class="result error" style="display: block;">
+                            <h3>❌ Error</h3>
+                            <p>${data.error}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                result.innerHTML = `
+                    <div class="result error" style="display: block;">
+                        <h3>❌ Error</h3>
+                        <p>Terjadi kesalahan: ${error.message}</p>
+                    </div>
+                `;
+            }
+        });
 
         document.getElementById('pdfForm').addEventListener('submit', async function(e) {
             e.preventDefault();
