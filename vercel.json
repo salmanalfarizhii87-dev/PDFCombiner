@@ -2,19 +2,17 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/combine.php",
-      "use": "@vercel/php",
+      "src": "api/combine.js",
+      "use": "@vercel/node",
       "config": {
-        "maxDuration": 30,
-        "memory": 1024
+        "maxDuration": 30
       }
     },
     {
-      "src": "api/download.php", 
-      "use": "@vercel/php",
+      "src": "api/download.js", 
+      "use": "@vercel/node",
       "config": {
-        "maxDuration": 10,
-        "memory": 512
+        "maxDuration": 10
       }
     },
     {
@@ -25,11 +23,11 @@
   "routes": [
     {
       "src": "/api/combine",
-      "dest": "/api/combine.php"
+      "dest": "/api/combine.js"
     },
     {
       "src": "/api/download",
-      "dest": "/api/download.php"
+      "dest": "/api/download.js"
     },
     {
       "src": "/",

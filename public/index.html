@@ -241,6 +241,30 @@
                 loading.style.display = 'none';
                 
                 if (data.success) {
+                    // Create download button that downloads the PDF directly
+                    const downloadButton = document.createElement('button');
+                    downloadButton.className = 'btn btn-success';
+                    downloadButton.innerHTML = '⬇️ Download PDF';
+                    downloadButton.onclick = function() {
+                        // Convert base64 to blob and download
+                        const byteCharacters = atob(data.pdfData);
+                        const byteNumbers = new Array(byteCharacters.length);
+                        for (let i = 0; i < byteCharacters.length; i++) {
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                        }
+                        const byteArray = new Uint8Array(byteNumbers);
+                        const blob = new Blob([byteArray], { type: 'application/pdf' });
+                        
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = data.filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                    };
+                    
                     result.innerHTML = `
                         <div class="result success" style="display: block;">
                             <h3>✅ ${data.message}</h3>
@@ -250,9 +274,11 @@
                                 <p><strong>Layout:</strong> ${data.layout}</p>
                             </div>
                             <br>
-                            <a href="${data.downloadUrl}" class="btn btn-success">⬇️ Download PDF</a>
                         </div>
                     `;
+                    
+                    // Append download button
+                    result.querySelector('.result.success').appendChild(downloadButton);
                 } else {
                     result.innerHTML = `
                         <div class="result error" style="display: block;">

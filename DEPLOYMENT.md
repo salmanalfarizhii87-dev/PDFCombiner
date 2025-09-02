@@ -4,7 +4,7 @@
 
 ### 1. Pastikan Dependencies Terinstall
 ```bash
-composer install
+npm install
 ```
 
 ### 2. Test Aplikasi Lokal (Opsional)

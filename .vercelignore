@@ -21,6 +21,8 @@ simple_test.php
 test_process.php
 test_upload.php
 paper_sizes_demo.html
+download.php
+index.php
 
 # IDE and editor files
 .vscode/

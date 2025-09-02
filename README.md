@@ -1,6 +1,6 @@
 # PDF Combiner
 
-Aplikasi web berbasis PHP untuk menggabungkan beberapa halaman PDF menjadi satu halaman PDF dengan layout yang dapat dikustomisasi. Aplikasi ini dapat di-deploy ke Vercel dengan mudah.
+Aplikasi web berbasis Node.js untuk menggabungkan beberapa halaman PDF menjadi satu halaman PDF dengan layout yang dapat dikustomisasi. Aplikasi ini dapat di-deploy ke Vercel dengan mudah.
 
 ## Fitur
 
@@ -60,25 +60,27 @@ Aplikasi web berbasis PHP untuk menggabungkan beberapa halaman PDF menjadi satu 
 ```
 PDFCombiner/
 ├── api/
-│   ├── combine.php      # API endpoint untuk combine PDF
-│   └── download.php     # API endpoint untuk download
+│   ├── combine.js       # API endpoint untuk combine PDF
+│   └── download.js      # API endpoint untuk download
 ├── public/
 │   └── index.html       # Frontend aplikasi
-├── vendor/              # PHP dependencies
+├── node_modules/        # Node.js dependencies (dari npm install)
 ├── vercel.json          # Konfigurasi Vercel
 ├── package.json         # Node.js dependencies
-├── composer.json        # PHP dependencies
 └── .env.example         # Environment variables template
 ```
 
 ## Instalasi Lokal
 
 1. Clone atau download project ini
-2. Install dependencies dengan Composer:
+2. Install dependencies dengan npm:
    ```bash
-   composer install
+   npm install
    ```
-3. Pastikan folder `output/` memiliki permission write (755)
+3. Jalankan development server:
+   ```bash
+   npm run dev
+   ```
 4. Akses aplikasi melalui web browser
 
 ## Struktur Project
@@ -108,48 +110,49 @@ PDFCombiner/
 
 ## Teknologi yang Digunakan
 
-- **PHP**: Backend processing
-- **FPDI**: Library untuk manipulasi PDF
+- **Node.js**: Backend processing
+- **pdf-lib**: Library untuk manipulasi PDF
+- **multer**: File upload handling
 - **HTML5**: Struktur halaman
 - **CSS3**: Styling modern dengan gradient dan animasi
 - **JavaScript**: Interaksi dan validasi client-side
-- **Composer**: Dependency management
+- **npm**: Dependency management
 
 ## Konfigurasi
 
 ### Ukuran File Maksimal
-Default: 10MB. Untuk mengubah, edit di `process.php`:
-```php
-if ($uploadedFile['size'] > 10 * 1024 * 1024) {
-    // Ubah nilai 10 sesuai kebutuhan
+Default: 10MB. Untuk mengubah, edit di `api/combine.js`:
+```javascript
+limits: {
+  fileSize: 10 * 1024 * 1024, // Ubah nilai 10 sesuai kebutuhan
 }
 ```
 
 ### Layout Halaman
-Untuk menambah opsi layout baru, edit di `index.php`:
+Untuk menambah opsi layout baru, edit di `public/index.html`:
 ```html
 <option value="9">9 halaman per 1 halaman</option>
 ```
 
-Dan tambahkan case di `process.php`:
-```php
+Dan tambahkan case di `api/combine.js`:
+```javascript
 case 9:
-    return ['rows' => 3, 'cols' => 3];
+  return { rows: 3, cols: 3 };
 ```
 
 ## Troubleshooting
 
-### Error: "Class 'setasign\Fpdi\Fpdi' not found"
-- Pastikan sudah menjalankan `composer install`
-- Pastikan file `vendor/autoload.php` ada
+### Error: "Cannot find module 'pdf-lib'"
+- Pastikan sudah menjalankan `npm install`
+- Pastikan file `node_modules/` ada
 
-### Error: "Permission denied" pada folder output
-- Set permission folder output: `chmod 755 output/`
-- Pastikan web server memiliki akses write ke folder
+### Error: "File upload failed"
+- Periksa ukuran file (maksimal 10MB)
+- Pastikan file adalah PDF yang valid
 
-### File tidak bisa diupload
-- Periksa setting `upload_max_filesize` dan `post_max_size` di php.ini
-- Pastikan folder upload memiliki permission yang tepat
+### Error: "PDF processing failed"
+- Pastikan PDF tidak corrupt
+- Coba dengan PDF yang lebih kecil
 
 ## Lisensi
 
