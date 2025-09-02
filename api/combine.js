@@ -72,9 +72,13 @@ export default async function handler(req, res) {
     const { pagesPerSheet = 4, pageArrangement = 'side_by_side', paperSize = 'A4' } = req.body;
 
     try {
+      console.log('Starting PDF processing...');
+      
       // Load the PDF
       const pdfDoc = await PDFDocument.load(req.file.buffer);
       const pageCount = pdfDoc.getPageCount();
+
+      console.log('PDF loaded, page count:', pageCount);
 
       if (pageCount === 0) {
         throw new Error('Invalid PDF file or empty PDF');
@@ -82,13 +86,16 @@ export default async function handler(req, res) {
 
       // Calculate layout
       const { rows, cols } = calculateLayout(parseInt(pagesPerSheet), pageArrangement);
+      console.log('Layout calculated:', { rows, cols });
       
       // Get paper dimensions
       const { width: pageWidth, height: pageHeight } = PAPER_SIZES[paperSize] || PAPER_SIZES.A4;
+      console.log('Paper dimensions:', { pageWidth, pageHeight });
       
       // Calculate individual page size
       const cellWidth = pageWidth / cols;
       const cellHeight = pageHeight / rows;
+      console.log('Cell dimensions:', { cellWidth, cellHeight });
 
       // Create new PDF document
       const newPdfDoc = await PDFDocument.create();
@@ -97,27 +104,33 @@ export default async function handler(req, res) {
       let pageIndex = 0;
 
       while (pageIndex < pageCount) {
+        console.log(`Processing page group starting from page ${pageIndex}`);
+        
         // Add new page
         const newPage = newPdfDoc.addPage([pageWidth, pageHeight]);
 
         // Place pages on current sheet
         for (let row = 0; row < rows && pageIndex < pageCount; row++) {
           for (let col = 0; col < cols && pageIndex < pageCount; col++) {
-            // Calculate position
-            const x = col * cellWidth;
-            const y = pageHeight - (row + 1) * cellHeight;
-
+            console.log(`Processing page ${pageIndex} at position (${row}, ${col})`);
+            
             try {
               // Copy page using copyPages method
               const [embeddedPage] = await newPdfDoc.copyPages(pdfDoc, [pageIndex]);
               
               // Get original page size
               const { width: originalWidth, height: originalHeight } = embeddedPage.getSize();
+              console.log(`Original page size: ${originalWidth}x${originalHeight}`);
 
               // Calculate scale to fit
               const scaleX = cellWidth / originalWidth;
               const scaleY = cellHeight / originalHeight;
               const scale = Math.min(scaleX, scaleY);
+              console.log(`Scale calculated: ${scale}`);
+
+              // Calculate position (PDF coordinates start from bottom-left)
+              const x = col * cellWidth;
+              const y = pageHeight - (row + 1) * cellHeight;
 
               // Calculate centered position
               const scaledWidth = originalWidth * scale;
@@ -125,13 +138,17 @@ export default async function handler(req, res) {
               const centeredX = x + (cellWidth - scaledWidth) / 2;
               const centeredY = y + (cellHeight - scaledHeight) / 2;
 
-              // Draw the embedded page
+              console.log(`Drawing page at position: (${centeredX}, ${centeredY}) with size: ${scaledWidth}x${scaledHeight}`);
+
+              // Draw the embedded page - try simpler approach first
               newPage.drawPage(embeddedPage, {
-                x: centeredX,
-                y: centeredY,
-                xScale: scale,
-                yScale: scale,
+                x: x,
+                y: y,
+                width: scaledWidth,
+                height: scaledHeight,
               });
+
+              console.log(`Successfully drew page ${pageIndex}`);
 
             } catch (pageError) {
               console.error(`Error processing page ${pageIndex}:`, pageError);
@@ -143,8 +160,12 @@ export default async function handler(req, res) {
         }
       }
 
+      console.log('All pages processed, generating PDF...');
+
       // Generate PDF bytes
       const pdfBytes = await newPdfDoc.save();
+
+      console.log('PDF generated, size:', pdfBytes.length, 'bytes');
 
       // Generate unique filename
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -152,6 +173,8 @@ export default async function handler(req, res) {
 
       // Convert to base64 properly
       const base64Data = Buffer.from(pdfBytes).toString('base64');
+
+      console.log('Base64 conversion completed, length:', base64Data.length);
 
       // Return success response
       res.status(200).json({
