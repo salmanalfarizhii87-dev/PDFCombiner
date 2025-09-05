@@ -143,16 +143,13 @@ try {
                 $originalWidth = $originalSize['width'];
                 $originalHeight = $originalSize['height'];
                 
-                // Calculate scale to fit
-                $scaleX = $pageWidth / $originalWidth;
-                $scaleY = $pageHeight / $originalHeight;
-                $scale = min($scaleX, $scaleY);
+                // Use the full allocated space for each page
+                $scaledWidth = $pageWidth;
+                $scaledHeight = $pageHeight;
                 
-                // Calculate centered position
-                $scaledWidth = $originalWidth * $scale;
-                $scaledHeight = $originalHeight * $scale;
-                $centeredX = $x + ($pageWidth - $scaledWidth) / 2;
-                $centeredY = $y + ($pageHeight - $scaledHeight) / 2;
+                // Position at the exact grid position
+                $centeredX = $x;
+                $centeredY = $y;
                 
                 // Use the imported page
                 $pdf->useTemplate($templateId, $centeredX, $centeredY, $scaledWidth, $scaledHeight);
