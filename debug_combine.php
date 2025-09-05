@@ -1,5 +1,5 @@
 <?php
-// Enable error reporting for debugging
+// Debug version of process.php with detailed logging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -14,11 +14,12 @@ require_once 'vendor/autoload.php';
 use setasign\Fpdi\Fpdi;
 
 // Function to send JSON response
-function sendResponse($success, $message, $filename = null) {
+function sendResponse($success, $message, $filename = null, $debug = []) {
     echo json_encode([
         'success' => $success,
         'message' => $message,
-        'filename' => $filename
+        'filename' => $filename,
+        'debug' => $debug
     ]);
     exit;
 }
@@ -53,33 +54,41 @@ $pagesPerSheet = (int)$_POST['pagesPerSheet'];
 $pageArrangement = $_POST['pageArrangement'];
 $paperSize = $_POST['paperSize'];
 
+$debug = [
+    'pagesPerSheet' => $pagesPerSheet,
+    'pageArrangement' => $pageArrangement,
+    'paperSize' => $paperSize,
+    'fileName' => $uploadedFile['name'],
+    'fileSize' => $uploadedFile['size']
+];
+
 // Validate file type
 $fileInfo = pathinfo($uploadedFile['name']);
 if (strtolower($fileInfo['extension']) !== 'pdf') {
-    sendResponse(false, 'File must be a PDF');
+    sendResponse(false, 'File must be a PDF', null, $debug);
 }
 
 // Validate file size (max 10MB)
 if ($uploadedFile['size'] > 10 * 1024 * 1024) {
-    sendResponse(false, 'File size too large. Maximum 10MB allowed');
+    sendResponse(false, 'File size too large. Maximum 10MB allowed', null, $debug);
 }
 
 // Validate pages per sheet
 $allowedPagesPerSheet = [2, 4, 5, 6, 8];
 if (!in_array($pagesPerSheet, $allowedPagesPerSheet)) {
-    sendResponse(false, 'Invalid pages per sheet option');
+    sendResponse(false, 'Invalid pages per sheet option', null, $debug);
 }
 
 // Validate page arrangement
 $allowedArrangements = ['side_by_side', 'top_bottom'];
 if (!in_array($pageArrangement, $allowedArrangements)) {
-    sendResponse(false, 'Invalid page arrangement option');
+    sendResponse(false, 'Invalid page arrangement option', null, $debug);
 }
 
 // Validate paper size
 $allowedPaperSizes = ['A4', 'Letter', 'Legal', 'A3', 'A5', 'B4', 'B5'];
 if (!in_array($paperSize, $allowedPaperSizes)) {
-    sendResponse(false, 'Invalid paper size option');
+    sendResponse(false, 'Invalid paper size option', null, $debug);
 }
 
 try {
@@ -99,8 +108,10 @@ try {
     // Import the uploaded PDF
     $pageCount = $pdf->setSourceFile($uploadedFile['tmp_name']);
     
+    $debug['pageCount'] = $pageCount;
+    
     if ($pageCount === 0) {
-        sendResponse(false, 'Invalid PDF file or empty PDF');
+        sendResponse(false, 'Invalid PDF file or empty PDF', null, $debug);
     }
 
     // Calculate layout based on pages per sheet and arrangement
@@ -108,29 +119,42 @@ try {
     $pagesPerRow = $layout['cols'];
     $pagesPerCol = $layout['rows'];
     
+    $debug['layout'] = $layout;
+    $debug['pagesPerRow'] = $pagesPerRow;
+    $debug['pagesPerCol'] = $pagesPerCol;
+    
     // Calculate new page size based on paper size
     $paperDimensions = getPaperDimensions($paperSize);
     $newPageWidth = $paperDimensions['width'];
     $newPageHeight = $paperDimensions['height'];
     
+    $debug['paperDimensions'] = $paperDimensions;
+    
     // Calculate individual page size
     $pageWidth = $newPageWidth / $pagesPerRow;
     $pageHeight = $newPageHeight / $pagesPerCol;
     
+    $debug['pageWidth'] = $pageWidth;
+    $debug['pageHeight'] = $pageHeight;
+    
     // Process pages in batches
     $currentPage = 1;
     $batchNumber = 1;
+    $totalSheets = 0;
     
     while ($currentPage <= $pageCount) {
+        $totalSheets++;
+        $debug["sheet_$totalSheets"] = [
+            'startPage' => $currentPage,
+            'pagesOnThisSheet' => []
+        ];
+        
         // Add new page
         $pdf->AddPage('P', [$newPageWidth, $newPageHeight]); // Paper size
         
-        $pagesOnThisSheet = 0;
-        $maxPagesPerSheet = $pagesPerRow * $pagesPerCol;
-        
         // Place pages on current sheet
-        for ($row = 0; $row < $pagesPerCol && $currentPage <= $pageCount && $pagesOnThisSheet < $maxPagesPerSheet; $row++) {
-            for ($col = 0; $col < $pagesPerRow && $currentPage <= $pageCount && $pagesOnThisSheet < $maxPagesPerSheet; $col++) {
+        for ($row = 0; $row < $pagesPerCol && $currentPage <= $pageCount; $row++) {
+            for ($col = 0; $col < $pagesPerRow && $currentPage <= $pageCount; $col++) {
                 // Import page
                 $templateId = $pdf->importPage($currentPage);
                 
@@ -154,29 +178,43 @@ try {
                 $centeredX = $x + ($pageWidth - $scaledWidth) / 2;
                 $centeredY = $y + ($pageHeight - $scaledHeight) / 2;
                 
+                $debug["sheet_$totalSheets"]['pagesOnThisSheet'][] = [
+                    'pageNumber' => $currentPage,
+                    'position' => ['row' => $row, 'col' => $col],
+                    'coordinates' => ['x' => $x, 'y' => $y],
+                    'centeredCoordinates' => ['x' => $centeredX, 'y' => $centeredY],
+                    'scale' => $scale,
+                    'originalSize' => ['width' => $originalWidth, 'height' => $originalHeight],
+                    'scaledSize' => ['width' => $scaledWidth, 'height' => $scaledHeight]
+                ];
+                
                 // Use the imported page
                 $pdf->useTemplate($templateId, $centeredX, $centeredY, $scaledWidth, $scaledHeight);
                 
                 $currentPage++;
-                $pagesOnThisSheet++;
             }
         }
         
         $batchNumber++;
     }
     
+    $debug['totalSheets'] = $totalSheets;
+    
     // Save the PDF
     $pdf->Output('F', $outputPath);
     
     // Verify file was created
     if (!file_exists($outputPath)) {
-        sendResponse(false, 'Failed to create output file');
+        sendResponse(false, 'Failed to create output file', null, $debug);
     }
     
-    sendResponse(true, 'PDF successfully combined', $outputFilename);
+    $debug['outputFileSize'] = filesize($outputPath);
+    
+    sendResponse(true, 'PDF successfully combined', $outputFilename, $debug);
     
 } catch (Exception $e) {
-    sendResponse(false, 'Error processing PDF: ' . $e->getMessage());
+    $debug['error'] = $e->getMessage();
+    sendResponse(false, 'Error processing PDF: ' . $e->getMessage(), null, $debug);
 }
 
 // Function to get paper dimensions

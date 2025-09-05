@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Combiner Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        button {
+            background: #007cba;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        .debug-output {
+            background: #f5f5f5;
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF Combiner Debug Test</h1>
+    
+    <form id="testForm">
+        <div class="form-group">
+            <label for="pdfFile">Select PDF File:</label>
+            <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="pagesPerSheet">Pages per Sheet:</label>
+            <select id="pagesPerSheet" name="pagesPerSheet">
+                <option value="2">2 halaman per 1 halaman</option>
+                <option value="4">4 halaman per 1 halaman</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="pageArrangement">Page Arrangement:</label>
+            <select id="pageArrangement" name="pageArrangement">
+                <option value="side_by_side">Side by Side (Horizontal)</option>
+                <option value="top_bottom">Top and Bottom (Vertical)</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="paperSize">Paper Size:</label>
+            <select id="paperSize" name="paperSize">
+                <option value="A4">A4</option>
+                <option value="Letter">Letter</option>
+            </select>
+        </div>
+        
+        <button type="submit">Test PDF Combination</button>
+    </form>
+    
+    <div id="debugOutput" class="debug-output" style="display: none;"></div>
+    
+    <script>
+        document.getElementById('testForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('pdfFile', document.getElementById('pdfFile').files[0]);
+            formData.append('pagesPerSheet', document.getElementById('pagesPerSheet').value);
+            formData.append('pageArrangement', document.getElementById('pageArrangement').value);
+            formData.append('paperSize', document.getElementById('paperSize').value);
+            
+            fetch('debug_combine.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const debugOutput = document.getElementById('debugOutput');
+                debugOutput.style.display = 'block';
+                debugOutput.textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                const debugOutput = document.getElementById('debugOutput');
+                debugOutput.style.display = 'block';
+                debugOutput.textContent = 'Error: ' + error.message;
+            });
+        });
+    </script>
+</body>
+</html>
